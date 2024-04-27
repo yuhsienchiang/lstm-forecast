@@ -49,6 +49,7 @@ class Attention(nn.Module):
         Forward pass of the attention mechanism.
 
     """
+
     def __init__(self, features_dim: int, device: str) -> None:
         """
         Initialize the Attention module.
@@ -120,6 +121,7 @@ class LSTMNetwork(nn.Module):
             Save the model parameters to a file.
 
     """
+
     def __init__(
         self,
         input_dim: int,

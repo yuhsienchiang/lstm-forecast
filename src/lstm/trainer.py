@@ -42,6 +42,7 @@ class LSTMTrainer:
         Train and validate the LSTM model.
 
     """
+
     def __init__(
         self,
         model: LSTMNetwork,
@@ -121,8 +122,8 @@ class LSTMTrainer:
         """
         self.train_dataset = train_dataset
         self.valid_dataset = valid_dataset
-        self.batch_size = batch_size if not self.model.stateful else train_dataset.window_size # 
-        self.drop_last = drop_last or self.model.stateful # when stateful, drop the last batch to prevent batch size mis-match
+        self.batch_size = batch_size if not self.model.stateful else train_dataset.window_size
+        self.drop_last = drop_last or self.model.stateful  # when stateful, drop the last batch to prevent batch size mis-match
         self.shuffle = shuffle and not self.model.stateful  # stateful LSTM cannot shuffle data
         self.epochs = epochs
         self.train_history = []
@@ -166,9 +167,7 @@ class LSTMTrainer:
 
         return deepcopy(self.train_history), deepcopy(self.valid_history)
 
-    def _train(
-        self, train_dataloader: DataLoader, quiet: bool = False
-    ) -> None:
+    def _train(self, train_dataloader: DataLoader, quiet: bool = False) -> None:
         """
         Perform one epoch of training loop.
 
@@ -190,11 +189,7 @@ class LSTMTrainer:
             batch_labels = batch_sample.label.to(self.model.device)
 
             # predict
-            label_predict, hidden, cell = self.model(
-                inputs=batch_instances,
-                hidden_init=hidden,
-                cell_init=cell
-            )
+            label_predict, hidden, cell = self.model(inputs=batch_instances, hidden_init=hidden, cell_init=cell)
 
             # calculate loss
             loss = self.loss_fn(label_predict, batch_labels)
@@ -245,11 +240,7 @@ class LSTMTrainer:
                 batch_labels = batch_sample.label.to(self.model.device)
 
                 # predict
-                label_predict, hidden, cell = self.model(
-                    inputs=batch_instances,
-                    hidden_init=hidden,
-                    cell_init=cell
-                )
+                label_predict, hidden, cell = self.model(inputs=batch_instances, hidden_init=hidden, cell_init=cell)
 
                 # calculate loss
                 loss = self.loss_fn(label_predict, batch_labels)

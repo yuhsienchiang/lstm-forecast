@@ -1,8 +1,8 @@
 import matplotlib.pyplot as plt
-from models import LSTMNetwork
-from trainer import LSTMTrainer
 
-from data import INSTANCE_KEYS, LSTMDataset
+from lstm.data import INSTANCE_KEYS, LSTMDataset
+from lstm.models import LSTMNetwork
+from lstm.trainer import LSTMTrainer
 
 
 def run():
@@ -17,7 +17,7 @@ def run():
     fc_dim = 16
     output_dim = 1
     attn_layer = False
-    stateful = True # if True, remember to set shuffle to False and batch_size to value equal to window_size
+    stateful = True  # if True, remember to set shuffle to False and batch_size to value equal to window_size
     device = "mps"
 
     # training parameters
@@ -76,6 +76,7 @@ def run():
     plt.plot(range(len(valid_history)), valid_history, label="Valid Loss")
     plt.legend()
     plt.savefig("valid_loss_stateful_5.png")
+
 
 if __name__ == "__main__":
     run()

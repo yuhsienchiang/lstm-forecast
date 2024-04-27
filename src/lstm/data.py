@@ -56,6 +56,7 @@ class LSTMDataset(Dataset):
         Function passed to DataLoader for batching data.
 
     """
+
     def __init__(self, data_src: str, window_size: int) -> None:
         """
         Initialize the LSTMDataset.
