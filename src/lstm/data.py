@@ -29,7 +29,45 @@ DATA_KEYS = INSTANCE_KEYS if LABEL_KEYS[0] in INSTANCE_KEYS else INSTANCE_KEYS +
 
 
 class LSTMDataset(Dataset):
+    """
+    Dataset class for preparing data for training LSTM models.
+
+    Attributes:
+    -----------
+    raw_data: pd.DataFrame
+        The raw data.
+    instances: torch.Tensor
+        The input sequences.
+    labels: torch.Tensor
+        The target labels.
+
+    Methods:
+    --------
+    _null_value_handler(data: pd.DataFrame) -> pd.DataFrame:
+        Handle null values in the data.
+
+    min_max_normalize(data: pd.DataFrame) -> pd.DataFrame:
+        Perform min-max normalization on the data.
+
+    min_max_denormalize(data: float | list[float] | pd.Series, labels: str | list[str]) -> float | list[float] | pd.Series:
+        Perform min-max denormalization on the data.
+
+    collate_fn(batch) -> Batch_LSTM_Sample:
+        Function passed to DataLoader for batching data.
+
+    """
     def __init__(self, data_src: str, window_size: int) -> None:
+        """
+        Initialize the LSTMDataset.
+
+        Parameters:
+        -----------
+        data_src: str or pd.DataFrame
+            The data source. It can be either a file path (str) or a pandas DataFrame.
+        window_size: int
+            The window size for creating sequences of data.
+
+        """
         super(LSTMDataset).__init__()
 
         if isinstance(data_src, str):
@@ -42,7 +80,6 @@ class LSTMDataset(Dataset):
         self.window_size = window_size
 
         data = self._null_value_handler(self.raw_data.copy(deep=True))
-        # data = self._time_data_handler(data.copy(deep=True))
 
         # get data size after removing unuseful data
         self.data_size = len(data) - self.window_size
@@ -71,12 +108,26 @@ class LSTMDataset(Dataset):
         return LSTM_Sample(label=self.labels[idx], instance=self.instances[idx])
 
     def _null_value_handler(self, data: pd.DataFrame) -> pd.DataFrame:
+        """
+        Handle null values in the data.
+
+        Parameters:
+        -----------
+        data: pd.DataFrame
+            The input data.
+
+        Returns:
+        --------
+        pd.DataFrame:
+            The cleaned data.
+
+        """
         null_demand_idx = data[data["demand"].isnull()].index.tolist()
         null_temp_air_idx = data[data["temp_air"].isnull()].index.tolist()
         null_pv_power_idx = data[data["pv_power"].isnull()].index.tolist()
         null_pv_power_basic_idx = data[data["pv_power_basic"].isnull()].index.tolist()
 
-        if len(null_temp_air_idx) > 0 or len(null_pv_power_idx) > 0 or len(null_pv_power_basic_idx) > 0:
+        if (len(null_temp_air_idx) > 0 or len(null_pv_power_idx) > 0 or len(null_pv_power_basic_idx) > 0):
             new_start_idx = max(null_temp_air_idx[-1], null_pv_power_idx[-1], null_pv_power_basic_idx[-1])
             data = data.iloc[new_start_idx + 1 :]
         if len(null_demand_idx) > 0:
@@ -84,18 +135,21 @@ class LSTMDataset(Dataset):
 
         return data
 
-    def _time_data_handler(self, data: pd.DataFrame) -> pd.DataFrame:
+    def min_max_normalize(self, data: pd.DataFrame) -> pd.DataFrame:
         """
-        extract month, day, and time from timestamp
+        Perform min-max normalization on the data.
+
+        Parameters:
+        -----------
+        data: pd.DataFrame
+            The input data.
+
+        Returns:
+        --------
+        pd.DataFrame:
+            The normalized data.
+
         """
-        data["timestamp"] = pd.to_datetime(data["timestamp"])
-        data["month"] = data["timestamp"].dt.month
-        data["day"] = data["timestamp"].dt.day
-        data["time"] = data["timestamp"].dt.hour + (data["timestamp"].dt.minute / 60)
-
-        return data
-
-    def _min_max_normalization(self, data: pd.DataFrame) -> pd.DataFrame:
         # min max normalization
         self.data_min = data.min()
         self.data_max = data.max()
@@ -103,9 +157,34 @@ class LSTMDataset(Dataset):
 
         return data
 
+    def min_max_denormalize(
+        self, data: float | list[float] | pd.Series, *, labels: str | list[str]
+    ) -> float | list[float] | pd.Series:
+        """
+        Perform min-max denormalization on the data.
+
+        Parameters:
+        -----------
+        data: float, list[float], pd.Series
+            The data to be denormalized.
+        labels: str or list[str]
+            The labels to be denormalized.
+
+        Returns:
+        --------
+        float or list[float] or pd.Series:
+            The denormalized data.
+
+        """
+
+        if labels == "all" or "all" in labels:
+            return data * (self.data_max - self.data_min) + self.data_min
+
+        return data * (self.data_max[labels] - self.data_min[labels]) + self.data_min[labels]
+
     def collate_fn(self, batch):
         """
-        function passed to DataLoader for batching data
+        Function passed to DataLoader for batching data
         """
         batch_instances = []
         batch_labels = []
