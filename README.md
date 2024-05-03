@@ -34,10 +34,22 @@ Consequently, after conducting thorough research, I decided to create my own imp
    ```bash
    poetry install
    ```
-5. Train the model by executing `train_runner.py`
-   ```bash
-   python train_runner.py
-   ```
+
+- Train
+
+  Train the model by executing `train_runner.py`
+
+  ```bash
+  python train_runner.py
+  ```
+
+- Test
+
+  All the unit test is located at [`test/`](./test/). To run the test, execute:
+
+  ```bash
+  python -m pytest
+  ```
 
 ## Stateful LSTM
 
