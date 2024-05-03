@@ -84,9 +84,9 @@ class Attention(nn.Module):
         """
         # calculate weights
         a_c = self.fc(inputs)
-        weights = torch.softmax(a_c, dim=1, dtype=torch.float32)
+        weights = torch.softmax(a_c, dim=-2, dtype=torch.float32)
         # return weighted sum
-        context = torch.sum(weights * inputs, dim=1, dtype=torch.float32)
+        context = torch.sum(weights * inputs, dim=-2, dtype=torch.float32)
         return context
 
 
@@ -202,15 +202,7 @@ class LSTMNetwork(nn.Module):
 
         """
         # only accept batched or unbatched 2D time serise inputs
-        shape = inputs.shape
-        if len(shape) != 2 and len(shape) != 3:
-            raise ValueError(f"Invalid input shape: {shape}.")
-
-        # batch unbatched inputs
-        if len(shape) == 2:
-            inputs = inputs.unsqueeze(1)
-
-        batch = inputs.shape[1]
+        batch = inputs.shape[1] if len(inputs.shape) == 3 else None
 
         if self.attn_layer:
             hiddens = []
@@ -228,14 +220,10 @@ class LSTMNetwork(nn.Module):
 
         if self.attn_layer:
             # forward pass through attention layer and fully connected layer
-            output = self.output(self.attn(torch.stack(hiddens, dim=1)))
+            output = self.output(self.attn(torch.stack(hiddens, dim=-2)))
         else:
             # forward pass through fully connected layer
             output = self.output(hidden)
-
-        # remove batch dimension if unbatched inputs
-        if len(shape) == 2:
-            output = output.squeeze(1)
 
         return output, hidden, cell
 
@@ -262,9 +250,12 @@ class LSTMNetwork(nn.Module):
             Initialized cell state tensor.
 
         """
+
         if hidden is None or cell is None:
-            hidden = torch.zeros(batch, self.hidden_dim, device=self.device)
-            cell = torch.zeros(batch, self.hidden_dim, device=self.device)
+            shape = (batch, self.hidden_dim) if batch else (self.hidden_dim,)
+
+            hidden = torch.zeros(*shape, device=self.device)
+            cell = torch.zeros(*shape, self.hidden_dim, device=self.device)
 
         return hidden, cell
 
