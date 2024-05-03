@@ -86,7 +86,7 @@ class LSTMDataset(Dataset):
         self.data_size = len(data) - self.window_size
 
         # normalise data
-        data = self._min_max_normalization(data[DATA_KEYS].copy(deep=True))
+        data = self.min_max_normalize(data[DATA_KEYS].copy(deep=True))
 
         # setup data set in a format that can be used to train LSTM
         instances_np = data[INSTANCE_KEYS].to_numpy(dtype=np.float32)
