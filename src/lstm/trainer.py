@@ -1,11 +1,11 @@
 from copy import deepcopy
 
 import torch
-from models import LSTMNetwork
+from src.lstm.models import LSTMNetwork
 from torch.optim import Optimizer
 from torch.utils.data import DataLoader
 
-from data import LSTMDataset
+from src.lstm.data import LSTMDataset
 
 
 class LSTMTrainer:

@@ -1,14 +1,14 @@
 import matplotlib.pyplot as plt
 
-from lstm.data import INSTANCE_KEYS, LSTMDataset
-from lstm.models import LSTMNetwork
-from lstm.trainer import LSTMTrainer
+from src.lstm.data import INSTANCE_KEYS, LSTMDataset
+from src.lstm.models import LSTMNetwork
+from src.lstm.trainer import LSTMTrainer
 
 
 def run():
     # data
-    train_data_src = "../data/training_data.csv"
-    valid_data_src = "../data/validation_data.csv"
+    train_data_src = "./data/training_data.csv"
+    valid_data_src = "./data/validation_data.csv"
     window_size = 48  # 4 hour ->48 5-min intervals
 
     # model architecture
