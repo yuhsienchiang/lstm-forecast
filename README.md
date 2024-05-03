@@ -2,9 +2,10 @@
 
 The primary objective of this repository is to provide an implementation of a **stateful LSTM** regression model using **PyTorch**.
 
-During the model development and training phase for the 2024 Green Battery Hackathon, I came across the concept of '**Stateful LSTM**'.
-While [TensorFlow](https://www.tensorflow.org/api_docs/python/tf/keras/layers/LSTM) offers a easy implementation of stateful LSTM by setting `stateful=True`, as a PyTorch user, I found limited resources, documentation, and implementations related to creating stateful LSTM models.
-Consequently, after conducting thorough research, I decided to develop and my own implementation of a stateful LSTM using PyTorch and share the resualt of my work.
+During the model development and training phase for the [2024 Green Battery Hackathon](https://www.mlai.au/hackathon), I came across the concept of **Stateful LSTM**.
+While [TensorFlow](https://www.tensorflow.org/api_docs/python/tf/keras/layers/LSTM) offers an easy implementation of stateful LSTM by simply setting `stateful=True`, as a [PyTorch](https://pytorch.org/) user, I found limited resources, documentation, and implementations related to creating stateful LSTM models.
+
+Consequently, after conducting thorough research, I decided to create my own implementation of a stateful LSTM using PyTorch and share the resualt of my work.
 
 ## Setup
 
@@ -38,6 +39,32 @@ Consequently, after conducting thorough research, I decided to develop and my ow
    python train_runner.py
    ```
 
+## Stateful LSTM
+
+Stateful LSTM is a variant of the Long Short-Term Memory (LSTM) model. In a standard LSTM model, the hidden state and cell state are reset after each sequence or batch of data is processed. However, in a stateful LSTM, the hidden state and cell state are preserved between batches or sequences.
+This means that the final hidden state and cell state from one batch or sequence become the initial hidden state and cell state for the next batch or sequence. This preservation of state allows the model to maintain memory beyond batches or sequences. By retaining information from previous batches or sequences, the stateful LSTM can capture longer-term dependencies in the data.
+Stateful LSTMs are particularly useful when dealing with data that has a clear temporal structure, such as time series data or sequences of text.
+They can help improve the model's ability to learn patterns and relationships in the data over time, leading to more accurate predictions or classifications.
+
+### Implementation
+
+On the [TensorFlow documentation page](https://www.tensorflow.org/api_docs/python/tf/keras/layers/LSTM), stateful is defined as:
+
+> Boolean (default: False).
+> If True, the last state for each sample at index i in a batch will be used as initial state for the sample of index i in the following batch.
+
+This can be illustrated in the figure bellow:
+
+<img src="./asset/stateful.png">
+
+The hidden and cell state are preserved through each epoch. At the start of each epoch, the hidden and cell state are initialised 0.
+
+To align the data in the correct order, there are some key points to keep in mind:
+
+1. Preserve the data order: `shuffle = False`
+2. **Batch size** should be equal to **time window size**: `batch_size = time_serise_window_size`
+3. **Dataloader** `drop_last = True`: This is to ensure the consistency of batch sizes through out the training loop.
+
 ## Dataset
 
 The datasets were data collected and provided by the 2024 Green Battery Hackathon.
@@ -55,4 +82,5 @@ The datasets were data collected and provided by the 2024 Green Battery Hackatho
 ## References
 
 - [Stateful LSTM in Keras](https://philipperemy.github.io/keras-stateful-lstm/)
+- [Stateful and Stateless LSTM for Time Series Forecasting with Python](https://machinelearningmastery.com/stateful-stateless-lstm-time-series-forecasting-python/)
 - [Stateful LSTM on time series (pytorch)](https://www.kaggle.com/code/viliuspstininkas/stateful-lstm-on-time-series-pytorch)
