@@ -1,11 +1,11 @@
 # LSTM Forecaster
 
-The primary objective of this repository is to provide an implementation of a **stateful LSTM** regression model using **PyTorch**.
+The primary objective of this repository is to provide an implementation of **stateful LSTM** regression model using **PyTorch**.
 
 During the model development and training phase for the [2024 Green Battery Hackathon](https://www.mlai.au/hackathon), I came across the concept of **Stateful LSTM**.
 While [TensorFlow](https://www.tensorflow.org/api_docs/python/tf/keras/layers/LSTM) offers an easy implementation of stateful LSTM by simply setting `stateful=True`, as a [PyTorch](https://pytorch.org/) user, I found limited resources, documentation, and implementations related to creating stateful LSTM models.
 
-Consequently, after conducting thorough research, I decided to create my own implementation of a stateful LSTM using PyTorch and share the resualt of my work.
+Consequently, after conducting thorough research, I decided to create my own implementation of stateful LSTM using PyTorch and share the resualt of my work.
 
 ## Setup
 
@@ -60,7 +60,7 @@ They can help improve the model's ability to learn patterns and relationships in
 
 ### Implementation
 
-On the [TensorFlow documentation page](https://www.tensorflow.org/api_docs/python/tf/keras/layers/LSTM), stateful is defined as:
+The [TensorFlow documentation](https://www.tensorflow.org/api_docs/python/tf/keras/layers/LSTM) defines stateful as:
 
 > Boolean (default: False).
 > If True, the last state for each sample at index i in a batch will be used as initial state for the sample of index i in the following batch.
@@ -69,7 +69,7 @@ This can be illustrated in the figure bellow:
 
 <img src="./asset/stateful.png">
 
-The hidden and cell state are preserved through each epoch. At the start of each epoch, the hidden and cell state are initialised 0.
+The hidden and cell state are preserved through each epoch. At the start of each epoch, the hidden and cell state are initialised to 0.
 
 To align the data in the correct order, there are some key points to keep in mind:
 
